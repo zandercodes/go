@@ -68,6 +68,7 @@ var (
 
 	flagOutfile    = flag.String("o", "", "write output to `file`")
 	flagPluginPath = flag.String("pluginpath", "", "full path name for plugin")
+	flagPluginHost = flag.String("pluginhost", "", "path to host EXE this plugin will be loaded by (windows only)")
 	flagFipso      = flag.String("fipso", "", "write fips module to `file`")
 
 	flagInstallSuffix = flag.String("installsuffix", "", "set package directory `suffix`")

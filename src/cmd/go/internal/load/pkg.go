@@ -2688,6 +2688,11 @@ func externalLinkingReason(s *modload.State, p *Package) (what string) {
 		}
 		fallthrough
 	case "plugin":
+		// On windows/amd64 the patched toolchain links plugins
+		// internally and does not require cgo.
+		if cfg.Goos == "windows" && cfg.Goarch == "amd64" {
+			break
+		}
 		return "-buildmode=" + cfg.BuildBuildmode
 	}
 

@@ -2296,6 +2296,15 @@
 //		Build the listed main packages, plus all packages that they
 //		import, into a Go plugin. Packages not named main are ignored.
 //
+//		On windows/amd64, plugins are produced as DLLs and the plugin
+//		linker must be told which host executable will load them via
+//		the -pluginhost linker flag, e.g.:
+//			go build -buildmode=plugin -ldflags=-pluginhost=host.exe \
+//				-o plugin.dll ./plugin
+//		The plugin reads the host's export table and embedded Go
+//		symbol metadata at link time and is bound to that specific
+//		host binary; rebuilding the host requires rebuilding plugins.
+//
 // On AIX, when linking a C program that uses a Go archive built with
 // -buildmode=c-archive, you must pass -Wl,-bnoobjreorder to the C compiler.
 //

@@ -1997,7 +1997,18 @@ func BuildInstallFunc(b *Builder, ctx context.Context, a *Action) (err error) {
 		defer b.cleanup(a1)
 	}
 
-	return sh.moveOrCopyFile(a.Target, a1.built, perm, false)
+	if err := sh.moveOrCopyFile(a.Target, a1.built, perm, false); err != nil {
+		return err
+	}
+	// If the linker emitted a plugin host side-car file (<exe>.gosymtab),
+	// install it next to the final binary so that plugins built later can
+	// resolve symbols against this host.
+	if _, err := os.Stat(a1.built + ".gosymtab"); err == nil {
+		if err := sh.moveOrCopyFile(a.Target+".gosymtab", a1.built+".gosymtab", 0666, false); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // AllowInstall returns a non-nil error if this invocation of the go command is

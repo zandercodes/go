@@ -155,6 +155,13 @@ func mustLinkExternal(ctxt *Link) (res bool, reason string) {
 			return true, "buildmode=pie"
 		}
 	case BuildModePlugin:
+		// On windows/amd64 the internal linker emits a self-contained
+		// plugin DLL that imports its runtime/stdlib symbols from the
+		// host EXE via the PE import table (see -pluginhost). On other
+		// platforms plugins still require external linking.
+		if buildcfg.GOOS == "windows" && buildcfg.GOARCH == "amd64" {
+			break
+		}
 		return true, "buildmode=plugin"
 	case BuildModeShared:
 		return true, "buildmode=shared"

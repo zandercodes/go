@@ -9,6 +9,7 @@ import (
 	"log"
 	"path/filepath"
 	"plugin"
+	"runtime"
 	"strings"
 
 	"testplugin/common"
@@ -145,11 +146,16 @@ func main() {
 	}
 
 	_, err = plugin.Open("plugin-mismatch.so")
-	if err == nil {
-		log.Fatal(`plugin.Open("plugin-mismatch.so"): should have failed`)
-	}
-	if s := err.Error(); !strings.Contains(s, "different version") {
-		log.Fatalf(`plugin.Open("plugin-mismatch.so"): error does not mention "different version": %v`, s)
+	if runtime.GOOS == "windows" {
+		// The plugin-mismatch source uses cgo, which the windows plugin
+		// port does not require. The TestMain harness skips building it.
+	} else {
+		if err == nil {
+			log.Fatal(`plugin.Open("plugin-mismatch.so"): should have failed`)
+		}
+		if s := err.Error(); !strings.Contains(s, "different version") {
+			log.Fatalf(`plugin.Open("plugin-mismatch.so"): error does not mention "different version": %v`, s)
+		}
 	}
 
 	_, err = plugin.Open("plugin2-dup.so")
